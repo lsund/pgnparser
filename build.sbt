@@ -1,4 +1,4 @@
-scalaVersion := "2.13.1"
+scalaVersion := "2.12.10"
 name := "pgnparser"
 organization := "com.github.lsund"
 version := "1.0.0"
