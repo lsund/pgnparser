@@ -1,5 +1,8 @@
 import scala.io.Source
 import scala.util.parsing.combinator._
+import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
+import java.nio.file.{Paths, Files}
+import java.nio.charset.StandardCharsets
 
 case class Metadata(key: String, value: String) {
   override def toString = s"($key,$value)"
@@ -28,7 +31,9 @@ class SimpleParser extends RegexParsers {
 
   // Turn
   def number: Parser[Int] = """[0-9]+""".r ^^ { _.toInt }
-  def ply: Parser[String] = """\s[NBRQKa-h]?x?[a-h1-8]?[a-h][1-8]\+?\s""".r ^^ { _.toString }
+  def ply: Parser[String] = """\s[NBRQKa-h]?x?[a-h1-8]?[a-h][1-8]\+?\s""".r ^^ {
+    _.toString
+  }
   def clock: Parser[String] =
     """\{ \[%clk [0-9]:[0-9]{2}:[0-9]{2}\] \}""".r ^^ {
       _.toString
@@ -52,15 +57,18 @@ class SimpleParser extends RegexParsers {
 
 object RunParser extends SimpleParser {
   def main(args: Array[String]): Unit = {
-    val lines = Source.fromFile("/home/lsund/file.txt").mkString
+    val infile = "/home/lsund/file.pgn"
+    val outfile = "/home/lsund/parsed.json"
+    val lines = Source.fromFile(infile).mkString
     parse(pgn, lines) match {
-      case Success(matched, _) => println(matched)
-      case Failure(msg, _)     => println(s"FAILURE: $msg")
-      case Error(msg, _)       => println(s"ERROR: $msg")
+      case Success(matched, _) =>
+        Files.write(
+          Paths.get(outfile),
+          matched.asJson.noSpaces.getBytes(StandardCharsets.UTF_8)
+        )
+        println("Wrote file: " + outfile)
+      case Failure(msg, _) => println(s"FAILURE: $msg")
+      case Error(msg, _)   => println(s"ERROR: $msg")
     }
   }
-}
-
-object Main extends App {
-  RunParser.main(Array())
 }
