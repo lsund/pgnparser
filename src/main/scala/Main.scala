@@ -67,6 +67,18 @@ class PgnParser extends RegexParsers {
 }
 
 object RunParser extends PgnParser {
+  def go(pgnfile: String, outfile: String) {
+        parse(pgn, Source.fromFile(pgnfile).mkString) match {
+          case Success(matched, _) =>
+            Files.write(
+              Paths.get(outfile),
+              matched.asJson.noSpaces.getBytes(StandardCharsets.UTF_8)
+            )
+            println("Wrote file: " + outfile)
+          case Failure(msg, _) => println(s"FAILURE: $msg")
+          case Error(msg, _)   => println(s"ERROR: $msg")
+        }
+  }
   def main(args: Array[String]): Unit = {
     val builder = OParser.builder[Config]
     val optsparser = {
@@ -85,17 +97,7 @@ object RunParser extends PgnParser {
       )
     }
     OParser.parse(optsparser, args, Config()) match {
-      case Some(Config(pgnfile, outfile)) =>
-        parse(pgn, Source.fromFile(pgnfile).mkString) match {
-          case Success(matched, _) =>
-            Files.write(
-              Paths.get(outfile),
-              matched.asJson.noSpaces.getBytes(StandardCharsets.UTF_8)
-            )
-            println("Wrote file: " + outfile)
-          case Failure(msg, _) => println(s"FAILURE: $msg")
-          case Error(msg, _)   => println(s"ERROR: $msg")
-        }
+      case Some(Config(pgnfile, outfile)) => go(pgnfile, outfile)
       case _ =>
     }
   }
