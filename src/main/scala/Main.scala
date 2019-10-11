@@ -8,7 +8,12 @@ import java.nio.charset.StandardCharsets
 import java.io.File
 import scopt.OParser
 
-case class Config(pgn: File = new File("test.pgn"), out: File = new File("test.json"))
+case class Config(
+    pgn: String = "test.pgn",
+    out: String = "test.json"
+) {
+  override def toString = s"Config[$pgn, $out]"
+}
 
 case class Metadata(key: String, value: String) {
   override def toString = s"($key,$value)"
@@ -64,43 +69,35 @@ class PgnParser extends RegexParsers {
 
 object RunParser extends PgnParser {
   def main(args: Array[String]): Unit = {
-    val infile = "/home/lsund/file.pgn"
-    val outfile = "/home/lsund/parsed.json"
-    val lines = Source.fromFile(infile).mkString
     val builder = OParser.builder[Config]
-
-    val parser1 = {
+    val optsparser = {
       import builder._
       OParser.sequence(
         programName("scopt"),
         head("scopt", "4.x"),
         builder
-          .opt[File]('p', "pgn")
+          .opt[String]('p', "pgn")
           .action((x, c) => c.copy(pgn = x))
           .text("PGN File to parse"),
         builder
-          .opt[File]('o', "out")
+          .opt[String]('o', "out")
           .action((x, c) => c.copy(out = x))
           .text("output JSON file")
       )
     }
-
-    OParser.parse(parser1, args, Config()) match {
-      case Some(config) =>
-      // do something
+    OParser.parse(optsparser, args, Config()) match {
+      case Some(Config(pgnfile, outfile)) =>
+        parse(pgn, Source.fromFile(pgnfile).mkString) match {
+          case Success(matched, _) =>
+            Files.write(
+              Paths.get(outfile),
+              matched.asJson.noSpaces.getBytes(StandardCharsets.UTF_8)
+            )
+            println("Wrote file: " + outfile)
+          case Failure(msg, _) => println(s"FAILURE: $msg")
+          case Error(msg, _)   => println(s"ERROR: $msg")
+        }
       case _ =>
-      // arguments are bad, error message will have been displayed
-    }
-
-    parse(pgn, lines) match {
-      case Success(matched, _) =>
-        Files.write(
-          Paths.get(outfile),
-          matched.asJson.noSpaces.getBytes(StandardCharsets.UTF_8)
-        )
-        println("Wrote file: " + outfile)
-      case Failure(msg, _) => println(s"FAILURE: $msg")
-      case Error(msg, _)   => println(s"ERROR: $msg")
     }
   }
 }
