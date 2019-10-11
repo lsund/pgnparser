@@ -66,8 +66,9 @@ case class CliOptions(
   override def toString = s"CliOptions[$pgn, $out]"
 }
 
-object RunParser extends PgnParser {
-  def toJson(pgnfile: String): String = {
+object ParseRunner extends PgnParser {
+
+  def generateJson(pgnfile: String): String = {
     parse(pgn, Source.fromFile(pgnfile).mkString) match {
       case Success(matched, _) =>
         matched.asJson.noSpaces
@@ -75,6 +76,14 @@ object RunParser extends PgnParser {
       case Error(msg, _)   => s"ERROR: $msg"
     }
   }
+
+  def writeJsonFile(pgnfile: String, outfile: String) {
+    Files.write(
+      Paths.get(outfile),
+      generateJson(pgnfile).getBytes(StandardCharsets.UTF_8)
+    )
+  }
+
   def main(args: Array[String]): Unit = {
     val builder = OParser.builder[CliOptions]
     val optsparser = {
@@ -94,12 +103,8 @@ object RunParser extends PgnParser {
     }
     // TODO Get rid of those default arguments
     OParser.parse(optsparser, args, CliOptions("changeme.png", "changeme.json")) match {
-      case Some(CliOptions(pgnfile, outfile)) =>
-        Files.write(
-          Paths.get(outfile),
-          toJson(pgnfile).getBytes(StandardCharsets.UTF_8)
-        )
-      case _ =>
+      case Some(CliOptions(pgnfile, outfile)) => writeJsonFile(pgnfile, outfile)
+      case _                                  => ;
     }
   }
 }
