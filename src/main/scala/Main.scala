@@ -7,13 +7,6 @@ import java.nio.file.{Paths, Files}, java.nio.charset.StandardCharsets
 import java.io.File
 import scopt.OParser
 
-case class Config(
-    pgn: String = "test.pgn",
-    out: String = "test.json"
-) {
-  override def toString = s"Config[$pgn, $out]"
-}
-
 case class Metadata(key: String, value: String) {
   override def toString = s"($key,$value)"
 }
@@ -66,6 +59,13 @@ class PgnParser extends RegexParsers {
     }
 }
 
+case class CliOptions(
+    pgn: String,
+    out: String
+) {
+  override def toString = s"CliOptions[$pgn, $out]"
+}
+
 object RunParser extends PgnParser {
   def toJson(pgnfile: String): String = {
     parse(pgn, Source.fromFile(pgnfile).mkString) match {
@@ -76,7 +76,7 @@ object RunParser extends PgnParser {
     }
   }
   def main(args: Array[String]): Unit = {
-    val builder = OParser.builder[Config]
+    val builder = OParser.builder[CliOptions]
     val optsparser = {
       import builder._
       OParser.sequence(
@@ -92,8 +92,8 @@ object RunParser extends PgnParser {
           .text("output JSON file")
       )
     }
-    OParser.parse(optsparser, args, Config()) match {
-      case Some(Config(pgnfile, outfile)) =>
+    OParser.parse(optsparser, args, CliOptions()) match {
+      case Some(CliOptions(pgnfile, outfile)) =>
         Files.write(
           Paths.get(outfile),
           toJson(pgnfile).getBytes(StandardCharsets.UTF_8)
