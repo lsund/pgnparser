@@ -1,4 +1,4 @@
-package com.github.pgnparser
+package com.github.lsund.pgnparser
 
 import scala.io.Source
 import scala.util.parsing.combinator._
