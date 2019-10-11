@@ -92,7 +92,8 @@ object RunParser extends PgnParser {
           .text("output JSON file")
       )
     }
-    OParser.parse(optsparser, args, CliOptions()) match {
+    // TODO Get rid of those default arguments
+    OParser.parse(optsparser, args, CliOptions("changeme.png", "changeme.json")) match {
       case Some(CliOptions(pgnfile, outfile)) =>
         Files.write(
           Paths.get(outfile),
