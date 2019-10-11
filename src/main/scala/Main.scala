@@ -23,6 +23,10 @@ class PgnParser extends RegexParsers {
 
   override def skipWhitespace = false
 
+  // Util
+  def eol = """(\r?\n)+""".r
+  def ws = """\s*""".r
+
   // Metadata
   def openBrace: Parser[String] = """\[""".r ^^ { _.toString }
   def closingBrace: Parser[String] = """\]""".r ^^ { _.toString }
@@ -47,10 +51,6 @@ class PgnParser extends RegexParsers {
 
   // Score
   def score: Parser[String] = """\s*[0-1]-[0-1]""".r
-
-  // Util
-  def eol = """(\r?\n)+""".r
-  def ws = """\s*""".r
 
   // Pgn
   def pgn: Parser[Pgn] =
