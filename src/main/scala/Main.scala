@@ -3,8 +3,7 @@ package com.github.lsund.pgnparser
 import scala.io.Source
 import scala.util.parsing.combinator._
 import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
-import java.nio.file.{Paths, Files}
-import java.nio.charset.StandardCharsets
+import java.nio.file.{Paths, Files}, java.nio.charset.StandardCharsets
 import java.io.File
 import scopt.OParser
 
