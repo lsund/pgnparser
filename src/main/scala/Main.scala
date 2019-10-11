@@ -1,8 +1,14 @@
+package me.lsund.pgnparser
+
 import scala.io.Source
 import scala.util.parsing.combinator._
 import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
 import java.nio.file.{Paths, Files}
 import java.nio.charset.StandardCharsets
+import java.io.File
+import scopt.OParser
+
+case class Config(pgn: File = new File("test.pgn"), out: File = new File("test.json"))
 
 case class Metadata(key: String, value: String) {
   override def toString = s"($key,$value)"
@@ -61,6 +67,31 @@ object RunParser extends PgnParser {
     val infile = "/home/lsund/file.pgn"
     val outfile = "/home/lsund/parsed.json"
     val lines = Source.fromFile(infile).mkString
+    val builder = OParser.builder[Config]
+
+    val parser1 = {
+      import builder._
+      OParser.sequence(
+        programName("scopt"),
+        head("scopt", "4.x"),
+        builder
+          .opt[File]('p', "pgn")
+          .action((x, c) => c.copy(pgn = x))
+          .text("PGN File to parse"),
+        builder
+          .opt[File]('o', "out")
+          .action((x, c) => c.copy(out = x))
+          .text("output JSON file")
+      )
+    }
+
+    OParser.parse(parser1, args, Config()) match {
+      case Some(config) =>
+      // do something
+      case _ =>
+      // arguments are bad, error message will have been displayed
+    }
+
     parse(pgn, lines) match {
       case Success(matched, _) =>
         Files.write(

@@ -1,6 +1,6 @@
 scalaVersion := "2.13.1"
-name := "hello-world"
-organization := "ch.epfl.scala"
+name := "pgnparser"
+organization := "me.lsund"
 version := "1.0"
 
 libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0"
@@ -14,3 +14,5 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-generic",
   "io.circe" %% "circe-parser"
 ).map(_ % circeVersion)
+
+libraryDependencies += "com.github.scopt" %% "scopt" % "4.0.0-RC2"
