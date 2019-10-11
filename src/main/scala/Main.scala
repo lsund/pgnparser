@@ -42,17 +42,18 @@ class PgnParser extends RegexParsers {
     case n ~ p ~ w ~ c ~ b ~ c2 => Turn(n, w.trim, b.trim)
   }
 
+  // Score
   def score: Parser[String] = """\s*[0-1]-[0-1]""".r
 
+  // Util
   def eol = """(\r?\n)+""".r
+  def ws = """\s*""".r
 
-  def any = ".*".r
-
+  // Pgn
   def pgn: Parser[Pgn] =
-    repsep(metadata, eol) ~ "\n\n" ~ repsep(turn, " ") ~ score ^^ {
+    repsep(metadata, eol) ~ "\n\n" ~ repsep(turn, ws) ~ score ^^ {
       case ms ~ ss ~ ts ~ sc => Pgn(ms, ts, sc)
     }
-
 }
 
 object RunParser extends PgnParser {
