@@ -12,11 +12,11 @@ case class Turn(number: Int, white: String, black: String) {
   override def toString = s"$number. $white $black"
 }
 
-case class Pgn(metadatas: List[Metadata], turns: List[Turn], score: String) {
-  override def toString = s"$metadatas - $turns score: $score"
+case class Pgn(metadata: List[Metadata], turns: List[Turn], score: String) {
+  override def toString = s"$metadata - $turns score: $score"
 }
 
-class SimpleParser extends RegexParsers {
+class PgnParser extends RegexParsers {
 
   override def skipWhitespace = false
 
@@ -55,7 +55,7 @@ class SimpleParser extends RegexParsers {
 
 }
 
-object RunParser extends SimpleParser {
+object RunParser extends PgnParser {
   def main(args: Array[String]): Unit = {
     val infile = "/home/lsund/file.pgn"
     val outfile = "/home/lsund/parsed.json"
