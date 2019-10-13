@@ -60,8 +60,8 @@ class PgnParser extends RegexParsers {
 }
 
 case class CliOptions(
-    pgn: String,
-    out: String
+    pgn: String = "",
+    out: String = ""
 ) {
   override def toString = s"CliOptions[$pgn, $out]"
 }
@@ -93,16 +93,17 @@ object ParseRunner extends PgnParser {
         head("scopt", "4.x"),
         builder
           .opt[String]('p', "pgn")
+          .required()
           .action((x, c) => c.copy(pgn = x))
           .text("PGN File to parse"),
         builder
           .opt[String]('o', "out")
+          .required()
           .action((x, c) => c.copy(out = x))
           .text("output JSON file")
       )
     }
-    // TODO Get rid of those default arguments
-    OParser.parse(optsparser, args, CliOptions("changeme.png", "changeme.json")) match {
+    OParser.parse(optsparser, args, CliOptions()) match {
       case Some(CliOptions(pgnfile, outfile)) => writeJsonFile(pgnfile, outfile)
       case _                                  => ;
     }
