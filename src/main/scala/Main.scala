@@ -89,8 +89,8 @@ object ParseRunner extends PgnParser {
     val optsparser = {
       import builder._
       OParser.sequence(
-        programName("scopt"),
-        head("scopt", "4.x"),
+        programName("pgnparser"),
+        head("pgnparser", "1.0.0"),
         builder
           .opt[String]('p', "pgn")
           .required()
