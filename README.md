@@ -1,3 +1,3 @@
 # PGNPARSER
 
-A pgn parser in scala. Please be kind.
+A quick and dirty PGN parser in Scala.
