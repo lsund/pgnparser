@@ -1,7 +1,7 @@
 scalaVersion := "2.12.10"
 name := "pgnparser"
 organization := "com.github.lsund"
-version := "1.0.0"
+version := "1.0.0-SNAPSHOT"
 
 // Dependencies
 libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0"
