@@ -7,17 +7,11 @@ import java.nio.file.{Paths, Files}, java.nio.charset.StandardCharsets
 import java.io.File
 import scopt.OParser
 
-case class Metadata(key: String, value: String) {
-  override def toString = s"($key,$value)"
-}
+case class Metadata(key: String, value: String) {}
 
-case class Turn(number: Int, white: String, black: String) {
-  override def toString = s"$number. $white $black"
-}
+case class Turn(number: Int, white: String, black: String) {}
 
-case class Pgn(metadata: List[Metadata], turns: List[Turn], score: String) {
-  override def toString = s"$metadata - $turns score: $score"
-}
+case class Game(metadata: List[Metadata], turns: List[Turn], score: String) {}
 
 class PgnParser extends RegexParsers {
 
@@ -52,10 +46,10 @@ class PgnParser extends RegexParsers {
   // Score
   def score: Parser[String] = """\s*[0-1]-[0-1]""".r
 
-  // Pgn
-  def pgn: Parser[Pgn] =
+  // Game
+  def game: Parser[Game] =
     repsep(metadata, eol) ~ "\n\n" ~ repsep(turn, ws) ~ score ^^ {
-      case ms ~ ss ~ ts ~ sc => Pgn(ms, ts, sc)
+      case ms ~ ss ~ ts ~ sc => Game(ms, ts, sc)
     }
 }
 
@@ -69,7 +63,7 @@ case class CliOptions(
 object ParseRunner extends PgnParser {
 
   def generateJson(pgnfile: String): String = {
-    parse(pgn, Source.fromFile(pgnfile).mkString) match {
+    parse(game, Source.fromFile(pgnfile).mkString) match {
       case Success(matched, _) =>
         matched.asJson.noSpaces
       case Failure(msg, _) => s"FAILURE: $msg"
